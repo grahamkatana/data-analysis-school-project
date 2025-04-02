@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Error - Credit Risk Analytics</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .error-container {
+        margin-top: 100px;
+        text-align: center;
+      }
+      .error-icon {
+        font-size: 60px;
+        color: #dc3545;
+        margin-bottom: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container error-container">
+      <div class="row">
+        <div class="col-md-8 offset-md-2">
+          <div class="card shadow">
+            <div class="card-body">
+              <div class="error-icon">⚠️</div>
+              <h1 class="card-title">Oops! Something went wrong</h1>
+              <p class="card-text">{{ error }}</p>
+              <a href="/admin" class="btn btn-primary"
+                >Return to Admin Dashboard</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

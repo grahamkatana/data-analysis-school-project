@@ -1,0 +1,26 @@
+# Web Framework
+flask
+flask-sqlalchemy
+flask-migrate
+flask-cors
+werkzeug
+jinja2
+itsdangerous
+
+# Data Processing
+pandas==2.1.1
+numpy==1.26.0
+scikit-learn==1.3.1
+joblib==1.3.2
+
+# Database
+sqlalchemy
+psycopg2-binary # For PostgreSQL
+
+# Visualization Dependencies
+plotly==5.17.0
+dash==2.13.0
+
+# ML Dependencies
+xgboost==2.0.0
+imbalanced-learn==0.11.0

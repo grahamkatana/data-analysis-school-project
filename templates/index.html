@@ -1,0 +1,885 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Analytics Platform</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Prism CSS for code highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --dark-bg: #1a1d21;
+            --darker-bg: #141618;
+            --accent-color: #6366f1;
+            --secondary-accent: #8b5cf6;
+            --card-bg: #212529;
+            --card-border: #2c3034;
+            --text-muted: #9ca3af;
+            --code-bg: #2d3748;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e9ecef;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--darker-bg) 0%, #1e2023 100%);
+            position: relative;
+            overflow: hidden;
+            padding: 6rem 0;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.15) 0%, transparent 25%),
+                radial-gradient(circle at 80% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 30%);
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        /* Feature Icons */
+        .feature-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 64px;
+            height: 64px;
+            margin-bottom: 1rem;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(139, 92, 246, 0.2));
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Navigation */
+        .navbar {
+            background-color: var(--darker-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 1rem 0;
+        }
+
+        .nav-link {
+            color: #e9ecef;
+            font-weight: 500;
+            transition: color 0.2s ease;
+            padding: 0.5rem 1rem;
+            margin: 0 0.25rem;
+            border-radius: 6px;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.1);
+        }
+
+        .nav-link.active {
+            color: var(--accent-color);
+            background-color: rgba(99, 102, 241, 0.15);
+        }
+
+        /* Buttons */
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .btn-accent:hover {
+            background-color: #5253cc;
+            border-color: #5253cc;
+            color: white;
+        }
+
+        .btn-outline-accent {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .btn-outline-accent:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+
+        /* Code blocks */
+        .code-block {
+            background-color: var(--code-bg);
+            border-radius: 10px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1.25rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+            border-top-left-radius: 10px;
+            border-top-right-radius: 10px;
+        }
+
+        pre[class*="language-"] {
+            border-radius: 0 0 10px 10px;
+            margin: 0;
+        }
+
+        /* Section styling */
+        .section {
+            padding: 5rem 0;
+            position: relative;
+        }
+
+        .section-bg-alt {
+            background-color: var(--darker-bg);
+            border-top: 1px solid var(--card-border);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        /* Footer */
+        .footer {
+            background-color: var(--darker-bg);
+            padding: 3rem 0;
+            border-top: 1px solid var(--card-border);
+        }
+
+        .footer-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: color 0.2s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--accent-color);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+
+        /* Endpoint table */
+        .endpoint-table th,
+        .endpoint-table td {
+            padding: 0.75rem 1rem;
+            border-color: var(--card-border);
+        }
+
+        .endpoint-table thead th {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom-width: 1px;
+        }
+
+        .endpoint-method {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .method-get {
+            background-color: rgba(16, 185, 129, 0.2);
+            color: #34D399;
+        }
+
+        .method-post {
+            background-color: rgba(99, 102, 241, 0.2);
+            color: #818CF8;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="bi bi-shield-lock me-2 text-primary"></i>
+                <span class="gradient-text">Credit Risk Analytics</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#overview">Overview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">Features</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#commands">Commands</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#api">API Reference</a>
+                    </li>
+                    <li class="nav-item ms-2">
+                        <a class="btn btn-accent" href="/admin">
+                            <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero" id="overview">
+        <div class="container">
+            <div class="row align-items-center hero-content">
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0s;">
+                    <h1 class="display-4 fw-bold mb-4">Credit Risk <span class="gradient-text">Analytics</span> Platform
+                    </h1>
+                    <p class="lead mb-4">Transform raw credit data into actionable risk insights. Make better lending
+                        decisions, optimize your loan portfolio, and increase profitability while reducing risk
+                        exposure.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/admin" class="btn btn-accent">
+                            <i class="bi bi-speedometer2 me-1"></i> Open Dashboard
+                        </a>
+                        <a href="#commands" class="btn btn-outline-accent">
+                            <i class="bi bi-terminal me-1"></i> View Commands
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 d-none d-lg-block animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="position-relative p-4">
+                        <div class="card mb-0 bg-opacity-25" style="transform: rotate(-5deg); z-index: 1;">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <h5 class="gradient-text mb-1">Default Risk Score</h5>
+                                        <p class="text-muted mb-0">Loan Application #1284</p>
+                                    </div>
+                                    <span class="badge bg-danger fs-6">High Risk</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar bg-danger" role="progressbar" style="width: 78%"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Risk Score</small>
+                                        <span class="fs-5">78%</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Confidence</small>
+                                        <span class="fs-5">92%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card mb-0"
+                            style="transform: rotate(3deg); position: absolute; top: 20px; right: 20px; z-index: 2;">
+                            <div class="card-body p-4">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <div>
+                                        <h5 class="gradient-text mb-1">Default Risk Score</h5>
+                                        <p class="text-muted mb-0">Loan Application #1285</p>
+                                    </div>
+                                    <span class="badge bg-success fs-6">Low Risk</span>
+                                </div>
+                                <div class="progress mb-3" style="height: 10px;">
+                                    <div class="progress-bar bg-success" role="progressbar" style="width: 24%"></div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Risk Score</small>
+                                        <span class="fs-5">24%</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Confidence</small>
+                                        <span class="fs-5">89%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Business Case -->
+    <section class="section" id="features">
+        <div class="container">
+            <div class="text-center mb-5 animate-fade-in">
+                <h2 class="gradient-text mb-2">Business Case</h2>
+                <p class="lead text-muted">Addressing critical challenges for financial institutions</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4 animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-graph-down text-primary"></i>
+                            </div>
+                            <h4>High Default Rates</h4>
+                            <p class="text-muted">Accurately predicts loan default risk to reduce financial losses and
+                                improve portfolio performance.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-lightning-charge text-primary"></i>
+                            </div>
+                            <h4>Efficient Risk Assessment</h4>
+                            <p class="text-muted">Automates credit risk evaluation for faster, consistent decisions
+                                across your lending operations.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4 animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-pie-chart text-primary"></i>
+                            </div>
+                            <h4>Resource Allocation</h4>
+                            <p class="text-muted">Prioritizes loan applications with higher probability of repayment to
+                                optimize your capital allocation.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-6 animate-fade-in" style="animation-delay: 0.4s;">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-search text-primary"></i>
+                            </div>
+                            <h4>Risk Pattern Identification</h4>
+                            <p class="text-muted">Reveals combinations of factors that contribute to defaults, enabling
+                                proactive risk management strategies.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-6 animate-fade-in" style="animation-delay: 0.5s;">
+                    <div class="card h-100">
+                        <div class="card-body p-4">
+                            <div class="feature-icon mb-3">
+                                <i class="bi bi-cash-stack text-primary"></i>
+                            </div>
+                            <h4>Risk-Based Pricing</h4>
+                            <p class="text-muted">Enables precise interest rate setting based on individual risk
+                                profiles, maximizing returns while maintaining competitiveness.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Backend Commands -->
+    <section class="section section-bg-alt" id="commands">
+        <div class="container">
+            <div class="text-center mb-5 animate-fade-in">
+                <h2 class="gradient-text mb-2">Backend Commands</h2>
+                <p class="lead text-muted">Quick reference guide for platform operations</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.1s;">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="bi bi-terminal me-2"></i>
+                            <h5 class="mb-0">Setup & Installation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Bash</span>
+                                    <button class="btn btn-sm btn-outline-light" onclick="copyCode(this)">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash">cd backend                           # Navigate to backend directory
+python -m venv venv                  # Create virtual environment
+source venv/bin/activate             # Activate virtual environment (Mac/Linux)
+pip install -r requirements.txt      # Install dependencies</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="bi bi-database me-2"></i>
+                            <h5 class="mb-0">Database Operations</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Bash</span>
+                                    <button class="btn btn-sm btn-outline-light" onclick="copyCode(this)">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash">python setup_db.py                   # Initialize database (direct script)
+
+# Flask CLI commands (after export FLASK_APP=app.py)
+flask init-db                        # Initialize database
+flask data-summary                   # View summary of data in database</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="bi bi-arrow-left-right me-2"></i>
+                            <h5 class="mb-0">ETL Pipeline & ML</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Bash</span>
+                                    <button class="btn btn-sm btn-outline-light" onclick="copyCode(this)">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash">flask etl-pipeline                   # Run full ETL pipeline
+flask load-data                      # Load data from CSV to database
+flask train-model                    # Train the ML model</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.4s;">
+                    <div class="card h-100">
+                        <div class="card-header d-flex align-items-center">
+                            <i class="bi bi-server me-2"></i>
+                            <h5 class="mb-0">Running the API</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="code-block">
+                                <div class="code-header">
+                                    <span>Bash</span>
+                                    <button class="btn btn-sm btn-outline-light" onclick="copyCode(this)">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                                <pre><code class="language-bash">flask run                            # Run development server
+# OR
+python app.py                        # Run directly with Python</code></pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Reference -->
+    <section class="section" id="api">
+        <div class="container">
+            <div class="text-center mb-5 animate-fade-in">
+                <h2 class="gradient-text mb-2">API Reference</h2>
+                <p class="lead text-muted">Available endpoints for platform integration</p>
+            </div>
+
+            <div class="card animate-fade-in" style="animation-delay: 0.1s;">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover endpoint-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Endpoint</th>
+                                    <th>Method</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>/admin</code></td>
+                                    <td><span class="endpoint-method method-get">GET</span></td>
+                                    <td>Admin dashboard interface</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/</code></td>
+                                    <td><span class="endpoint-method method-get">GET</span></td>
+                                    <td>Redirects to admin dashboard</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/health</code></td>
+                                    <td><span class="endpoint-method method-get">GET</span></td>
+                                    <td>API health check endpoint</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/data/summary</code></td>
+                                    <td><span class="endpoint-method method-get">GET</span></td>
+                                    <td>Get summary statistics of credit risk data</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/data</code></td>
+                                    <td><span class="endpoint-method method-get">GET</span></td>
+                                    <td>Get paginated credit risk data with optional filtering</td>
+                                </tr>
+                                <tr>
+                                    <td><code>/api/ml/predict</code></td>
+                                    <td><span class="endpoint-method method-post">POST</span></td>
+                                    <td>Make credit risk prediction with loan applicant data</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-5 g-4">
+                <div class="col-md-4 animate-fade-in" style="animation-delay: 0.2s;">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Frontend Access</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush bg-transparent">
+                                <li class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                    <i class="bi bi-speedometer2 me-2 text-primary"></i>
+                                    Admin Dashboard: <code class="ms-2">http://localhost:5000/admin</code>
+                                </li>
+                                <li class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                    <i class="bi bi-server me-2 text-primary"></i>
+                                    Data API: <code class="ms-2">http://localhost:5000/api/data</code>
+                                </li>
+                                <li class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                    <i class="bi bi-window me-2 text-primary"></i>
+                                    React Frontend: <code class="ms-2">http://localhost:3000</code>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h5 class="mb-0">Key Files</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush bg-transparent">
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-file-code me-2 text-primary"></i>
+                                            <code>app.py</code>
+                                            <span class="ms-2">Main Flask application</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-file-code me-2 text-primary"></i>
+                                            <code>models/credit_risk.py</code>
+                                            <span class="ms-2">Database models</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-folder me-2 text-primary"></i>
+                                            <code>etl/</code>
+                                            <span class="ms-2">Data processing pipeline</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-6">
+                                    <ul class="list-group list-group-flush bg-transparent">
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-folder me-2 text-primary"></i>
+                                            <code>ml/</code>
+                                            <span class="ms-2">Machine learning components</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-file-code me-2 text-primary"></i>
+                                            <code>templates/admin.html</code>
+                                            <span class="ms-2">Admin interface</span>
+                                        </li>
+                                        <li
+                                            class="list-group-item bg-transparent d-flex align-items-center border-0 ps-0">
+                                            <i class="bi bi-file-code me-2 text-primary"></i>
+                                            <code>commands.py</code>
+                                            <span class="ms-2">CLI commands</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Summary Section -->
+    <section class="section section-bg-alt">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.1s;">
+                    <h2 class="gradient-text mb-4">Transform Your Lending Operations</h2>
+                    <p class="mb-4">This comprehensive platform transforms raw credit data into actionable risk
+                        insights, helping financial institutions make better lending decisions, optimize their loan
+                        portfolios, and increase profitability while reducing risk exposure.</p>
+                    <div class="d-flex flex-wrap gap-3">
+                        <a href="/admin" class="btn btn-accent">
+                            <i class="bi bi-speedometer2 me-1"></i> Open Dashboard
+                        </a>
+                        <a href="#" class="btn btn-outline-accent">
+                            <i class="bi bi-journal-text me-1"></i> Documentation
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6 animate-fade-in" style="animation-delay: 0.3s;">
+                    <div class="card bg-transparent border-0">
+                        <div class="card-body p-4">
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="feature-icon me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-graph-up"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0">Predictive Analytics</h4>
+                                    <p class="text-muted mb-0">ML-powered default prediction</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center mb-4">
+                                <div class="feature-icon me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-shield-check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0">Risk Management</h4>
+                                    <p class="text-muted mb-0">Comprehensive risk assessment</p>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class="feature-icon me-3" style="width: 48px; height: 48px;">
+                                    <i class="bi bi-speedometer"></i>
+                                </div>
+                                <div>
+                                    <h4 class="mb-0">Real-time Insights</h4>
+                                    <p class="text-muted mb-0">Instant decision support</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-4 mb-4 mb-lg-0">
+                    <h5 class="gradient-text mb-4">Credit Risk Analytics</h5>
+                    <p class="text-muted">A comprehensive platform for financial institutions to make data-driven
+                        lending decisions and optimize their loan portfolios.</p>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h6 class="text-white mb-3">Platform</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#overview" class="footer-link">Overview</a></li>
+                        <li class="mb-2"><a href="#features" class="footer-link">Features</a></li>
+                        <li class="mb-2"><a href="#commands" class="footer-link">Commands</a></li>
+                        <li><a href="#api" class="footer-link">API Reference</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-md-6 mb-4 mb-md-0">
+                    <h6 class="text-white mb-3">Resources</h6>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><a href="#" class="footer-link">Documentation</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">Tutorials</a></li>
+                        <li class="mb-2"><a href="#" class="footer-link">API Docs</a></li>
+                        <li><a href="#" class="footer-link">Case Studies</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="text-white mb-3">Access Platform</h6>
+                    <div class="d-grid gap-2 mb-3">
+                        <a href="/admin" class="btn btn-accent">
+                            <i class="bi bi-speedometer2 me-1"></i> Open Dashboard
+                        </a>
+                        <a href="/api/health" class="btn btn-outline-accent">
+                            <i class="bi bi-heart-pulse me-1"></i> API Health Check
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <hr class="mt-4 mb-4" style="border-color: var(--card-border);">
+            <div class="row">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="text-muted mb-0">&copy; 2025 Credit Risk Analytics. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end">
+                    <a href="#" class="footer-link me-3"><i class="bi bi-github"></i></a>
+                    <a href="#" class="footer-link me-3"><i class="bi bi-linkedin"></i></a>
+                    <a href="#" class="footer-link"><i class="bi bi-twitter-x"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Prism JS for code highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/components/prism-core.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.27.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <!-- Custom JS -->
+    <script>
+        // Copy code function
+        function copyCode(button) {
+            const codeBlock = button.parentElement.nextElementSibling;
+            const code = codeBlock.textContent;
+
+            navigator.clipboard.writeText(code).then(() => {
+                const originalHtml = button.innerHTML;
+                button.innerHTML = '<i class="bi bi-check"></i>';
+
+                setTimeout(() => {
+                    button.innerHTML = originalHtml;
+                }, 2000);
+            });
+        }
+
+        // Highlight the active navigation item
+        document.addEventListener('DOMContentLoaded', function () {
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            window.addEventListener('scroll', function () {
+                let current = '';
+
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+
+                    if (scrollY >= (sectionTop - 200)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href').includes(current)) {
+                        link.classList.add('active');
+                    }
+                });
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+
+                document.querySelector(targetId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

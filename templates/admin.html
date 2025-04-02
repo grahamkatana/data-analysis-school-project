@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credit Risk Analytics - Admin Panel</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --dark-bg: #1a1d21;
+            --darker-bg: #141618;
+            --accent-color: #6366f1;
+            --card-bg: #212529;
+            --card-border: #2c3034;
+            --text-muted: #9ca3af;
+        }
+        
+        body {
+            background-color: var(--dark-bg);
+            color: #e9ecef;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .header {
+            background-color: var(--darker-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        
+        .logo-text {
+            font-weight: 700;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+        
+        .stats-card {
+            height: 100%;
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .stats-card .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+        
+        .stats-card .title {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .stats-primary {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.1));
+        }
+        
+        .stats-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.1));
+        }
+        
+        .stats-danger {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1));
+        }
+        
+        .stats-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
+        }
+        
+        .table {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table-striped > tbody > tr:nth-of-type(odd) > * {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        .table > :not(caption) > * > * {
+            border-bottom-color: var(--card-border);
+        }
+        
+        .dataTables_wrapper .dataTables_length, 
+        .dataTables_wrapper .dataTables_filter, 
+        .dataTables_wrapper .dataTables_info, 
+        .dataTables_wrapper .dataTables_processing, 
+        .dataTables_wrapper .dataTables_paginate {
+            color: #e9ecef;
+            margin-bottom: 1rem;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            border-radius: 6px;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--accent-color) !important;
+            border-color: var(--accent-color) !important;
+            color: white !important;
+        }
+        
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background-color: #5253cc;
+            border-color: #5253cc;
+            color: white;
+        }
+        
+        .btn-outline-accent {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+        }
+        
+        .btn-outline-accent:hover {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .badge-default {
+            background-color: var(--text-muted);
+            color: #fff;
+        }
+        
+        #deleteAllModal .modal-content {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+        
+        #deleteAllModal .modal-header {
+            background-color: #b91c1c;
+            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container-fluid">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="logo-text mb-0">Credit Risk Analytics</h1>
+                    <p class="text-muted mb-0">Admin Control Panel</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="/api/health" class="btn btn-outline-accent me-2">
+                        <i class="bi bi-heart-pulse me-1"></i> API Health
+                    </a>
+                    <a href="/" class="btn btn-accent">
+                        <i class="bi bi-house-door me-1"></i> Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="stats-card stats-primary">
+                    <div class="title">Total Records</div>
+                    <div class="value" id="totalRecords">{{ total_records }}</div>
+                    <div><i class="bi bi-database"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-success">
+                    <div class="title">Non-Default Loans</div>
+                    <div class="value" id="nonDefaultCount">{{ non_default_count }}</div>
+                    <div><i class="bi bi-check-circle"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-danger">
+                    <div class="title">Default Loans</div>
+                    <div class="value" id="defaultCount">{{ default_count }}</div>
+                    <div><i class="bi bi-exclamation-triangle"></i></div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-info">
+                    <div class="title">Default Rate</div>
+                    <div class="value" id="defaultRate">{{ default_rate }}%</div>
+                    <div><i class="bi bi-graph-up"></i></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Data Management</h5>
+                        <div>
+                            <button type="button" class="btn btn-outline-accent me-2" id="refreshBtn">
+                                <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
+                            </button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                                <i class="bi bi-trash me-1"></i> Delete All Records
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- DataTable -->
+                        <div class="table-responsive">
+                            <table id="creditRiskTable" class="table table-striped" style="width:100%">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Age</th>
+                                        <th>Income</th>
+                                        <th>Home Ownership</th>
+                                        <th>Emp Length</th>
+                                        <th>Loan Intent</th>
+                                        <th>Loan Grade</th>
+                                        <th>Loan Amount</th>
+                                        <th>Interest Rate</th>
+                                        <th>Status</th>
+                                        <th>Default on File</th>
+                                        <th>Credit History</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for record in records %}
+                                    <tr>
+                                        <td>{{ record.id }}</td>
+                                        <td>{{ record.person_age }}</td>
+                                        <td>${{ "{:,.0f}".format(record.person_income) }}</td>
+                                        <td>{{ record.person_home_ownership }}</td>
+                                        <td>{{ record.person_emp_length }}</td>
+                                        <td>{{ record.loan_intent }}</td>
+                                        <td>{{ record.loan_grade }}</td>
+                                        <td>${{ "{:,.0f}".format(record.loan_amnt) }}</td>
+                                        <td>{{ record.loan_int_rate }}%</td>
+                                        <td>
+                                            {% if record.loan_status == 1 %}
+                                                <span class="badge bg-danger">Default</span>
+                                            {% else %}
+                                                <span class="badge bg-success">Non-Default</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ record.cb_person_default_on_file }}</td>
+                                        <td>{{ record.cb_person_cred_hist_length }}</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete All Confirmation Modal -->
+    <div class="modal fade" id="deleteAllModal" tabindex="-1" aria-labelledby="deleteAllModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteAllModalLabel">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-danger">
+                        <p><strong>Warning!</strong> You are about to delete all credit risk records from the database.</p>
+                        <p class="mb-0">This action cannot be undone. Are you sure you want to proceed?</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteAll">
+                        <i class="bi bi-trash me-1"></i> Yes, Delete All Records
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- DataTables JS -->
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#creditRiskTable').DataTable({
+                pageLength: 25,
+                lengthMenu: [10, 25, 50, 100, 250],
+                order: [[0, 'desc']], // Sort by ID descending by default
+                responsive: true,
+                language: {
+                    search: "_INPUT_",
+                    searchPlaceholder: "Search records..."
+                },
+                drawCallback: function() {
+                    $('.dataTables_wrapper .dataTables_paginate .paginate_button').addClass('btn-sm');
+                }
+            });
+            
+            // Refresh data
+            $('#refreshBtn').click(function() {
+                const btn = $(this);
+                btn.html('<i class="bi bi-arrow-repeat"></i> Refreshing...');
+                btn.prop('disabled', true);
+                
+                setTimeout(function() {
+                    location.reload();
+                }, 500);
+            });
+            
+            // Handle delete all records
+            $('#confirmDeleteAll').click(function() {
+                const btn = $(this);
+                btn.html('<i class="bi bi-hourglass-split"></i> Deleting...');
+                btn.prop('disabled', true);
+                
+                $.ajax({
+                    url: '/admin/delete-all',
+                    type: 'POST',
+                    success: function(result) {
+                        // Close modal
+                        $('#deleteAllModal').modal('hide');
+                        
+                        // Update stats
+                        $('#totalRecords').text('0');
+                        $('#defaultCount').text('0');
+                        $('#nonDefaultCount').text('0');
+                        $('#defaultRate').text('0%');
+                        
+                        // Clear table
+                        $('#creditRiskTable').DataTable().clear().draw();
+                        
+                        // Show success notification
+                        const notification = `
+                            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header bg-success text-white">
+                                        <i class="bi bi-check-circle me-2"></i>
+                                        <strong class="me-auto">Success</strong>
+                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body bg-dark text-light">
+                                        All records have been deleted successfully.
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        $('body').append(notification);
+                        
+                        // Auto-dismiss toast after 3 seconds
+                        setTimeout(function() {
+                            $('.toast').toast('hide');
+                        }, 3000);
+                        
+                        // Reset button state
+                        btn.html('<i class="bi bi-trash me-1"></i> Yes, Delete All Records');
+                        btn.prop('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        // Show error notification
+                        const notification = `
+                            <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+                                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                                    <div class="toast-header bg-danger text-white">
+                                        <i class="bi bi-exclamation-circle me-2"></i>
+                                        <strong class="me-auto">Error</strong>
+                                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                                    </div>
+                                    <div class="toast-body bg-dark text-light">
+                                        Error deleting records: ${error}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                        
+                        $('body').append(notification);
+                        
+                        // Auto-dismiss toast after 5 seconds
+                        setTimeout(function() {
+                            $('.toast').toast('hide');
+                        }, 5000);
+                        
+                        // Reset button state
+                        btn.html('<i class="bi bi-trash me-1"></i> Yes, Delete All Records');
+                        btn.prop('disabled', false);
+                        
+                        // Close modal
+                        $('#deleteAllModal').modal('hide');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
