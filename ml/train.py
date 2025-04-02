@@ -132,3 +132,78 @@ def train_model_pipeline(input_file, model_type="xgboost", model_dir=None):
     except Exception as e:
         logger.error(f"Error in model training pipeline: {str(e)}")
         raise
+
+
+def train_xgboost(X_train, y_train):
+    """Trains an XGBoost model."""
+    param_grid = {
+        "n_estimators": [100, 200],
+        "learning_rate": [0.01, 0.1],
+        "max_depth": [3, 5],
+    }
+    xgb_model = xgb.XGBClassifier(random_state=42)
+    grid_search = GridSearchCV(
+        xgb_model,
+        param_grid,
+        cv=StratifiedKFold(n_splits=3),
+        scoring="roc_auc",
+        n_jobs=-1,
+    )
+    grid_search.fit(X_train, y_train)
+    best_model = grid_search.best_estimator_
+    return best_model, grid_search.best_params_
+
+
+def train_random_forest(X_train, y_train):
+    """Trains a Random Forest model."""
+    param_grid = {
+        "n_estimators": [100, 200],
+        "max_depth": [None, 10],
+        "min_samples_split": [2, 5],
+    }
+    rf_model = RandomForestClassifier(random_state=42)
+    grid_search = GridSearchCV(
+        rf_model,
+        param_grid,
+        cv=StratifiedKFold(n_splits=3),
+        scoring="roc_auc",
+        n_jobs=-1,
+    )
+    grid_search.fit(X_train, y_train)
+    best_model = grid_search.best_estimator_
+    return best_model, grid_search.best_params_
+
+
+def train_logistic_regression(X_train, y_train):
+    """Trains a Logistic Regression model."""
+    param_grid = {
+        "C": [0.001, 0.01, 0.1, 1, 10],
+        "penalty": ["l1", "l2"],
+        "solver": ["liblinear"],
+    }
+    lr_model = LogisticRegression(random_state=42)
+    grid_search = GridSearchCV(
+        lr_model,
+        param_grid,
+        cv=StratifiedKFold(n_splits=3),
+        scoring="roc_auc",
+        n_jobs=-1,
+    )
+    grid_search.fit(X_train, y_train)
+    best_model = grid_search.best_estimator_
+    return best_model, grid_search.best_params_
+
+
+def evaluate_model(model, X_test, y_test):
+    """Evaluates the trained model."""
+    y_pred = model.predict(X_test)
+    y_pred_proba = model.predict_proba(X_test)[:, 1]
+    metrics = {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "precision": precision_score(y_test, y_pred),
+        "recall": recall_score(y_test, y_pred),
+        "f1": f1_score(y_test, y_pred),
+        "roc_auc": roc_auc_score(y_test, y_pred_proba),
+        "confusion_matrix": confusion_matrix(y_test, y_pred).tolist(),
+    }
+    return metrics
