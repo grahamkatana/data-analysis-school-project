@@ -18,15 +18,7 @@ logger = logging.getLogger(__name__)
 def create_preprocessing_pipeline(categorical_features=None, numeric_features=None):
     """
     Create a preprocessing pipeline for categorical and numeric features.
-
-    Args:
-        categorical_features (list): List of categorical feature names
-        numeric_features (list): List of numeric feature names
-
-    Returns:
-        sklearn.pipeline.Pipeline: Preprocessing pipeline
     """
-    # Default feature lists if not provided
     if categorical_features is None:
         categorical_features = [
             "person_home_ownership",
@@ -51,7 +43,6 @@ def create_preprocessing_pipeline(categorical_features=None, numeric_features=No
             "loan_to_income_percent",
         ]
 
-    # Preprocessing for numeric features
     numeric_transformer = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="median")),
@@ -59,7 +50,6 @@ def create_preprocessing_pipeline(categorical_features=None, numeric_features=No
         ]
     )
 
-    # Preprocessing for categorical features
     categorical_transformer = Pipeline(
         steps=[
             ("imputer", SimpleImputer(strategy="most_frequent")),
@@ -67,13 +57,12 @@ def create_preprocessing_pipeline(categorical_features=None, numeric_features=No
         ]
     )
 
-    # Combine preprocessing steps
     preprocessor = ColumnTransformer(
         transformers=[
             ("num", numeric_transformer, numeric_features),
             ("cat", categorical_transformer, categorical_features),
         ],
-        remainder="drop",  # Drop any columns that weren't specified
+        remainder="drop",
     )
 
     return preprocessor
@@ -82,31 +71,19 @@ def create_preprocessing_pipeline(categorical_features=None, numeric_features=No
 def preprocess_data(df, target_column="loan_status", test_size=0.2, random_state=42):
     """
     Preprocess data for machine learning.
-
-    Args:
-        df (pandas.DataFrame): DataFrame to preprocess
-        target_column (str): Name of the target column
-        test_size (float): Proportion of data to use for testing
-        random_state (int): Random seed for reproducibility
-
-    Returns:
-        dict: Dictionary containing preprocessed data and preprocessing objects
     """
     from sklearn.model_selection import train_test_split
 
     logger.info("Preprocessing data for machine learning")
 
-    # Make a copy of the dataframe
     df_copy = df.copy()
 
-    # Split features and target
     if target_column not in df_copy.columns:
         raise ValueError(f"Target column '{target_column}' not found in DataFrame")
 
     X = df_copy.drop(columns=[target_column])
     y = df_copy[target_column]
 
-    # Split into train and test sets
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=test_size, random_state=random_state, stratify=y
     )
@@ -115,13 +92,10 @@ def preprocess_data(df, target_column="loan_status", test_size=0.2, random_state
         f"Split data into train ({len(X_train)} rows) and test ({len(X_test)} rows) sets"
     )
 
-    # Get categorical and numeric feature lists
-    categorical_features = X.select_dtypes(
-        include=["object", "category"]
-    ).columns.tolist()
+    # Correct Feature Type Separation
+    categorical_features = X.select_dtypes(include=["object"]).columns.tolist()
     numeric_features = X.select_dtypes(include=["int64", "float64"]).columns.tolist()
 
-    # Create and fit preprocessing pipeline
     preprocessor = create_preprocessing_pipeline(
         categorical_features=categorical_features, numeric_features=numeric_features
     )
@@ -130,7 +104,6 @@ def preprocess_data(df, target_column="loan_status", test_size=0.2, random_state
     X_train_processed = preprocessor.fit_transform(X_train)
     X_test_processed = preprocessor.transform(X_test)
 
-    # Get feature names after preprocessing
     categorical_ohe_feature_names = []
     if categorical_features:
         ohe = preprocessor.named_transformers_["cat"].named_steps["onehot"]
@@ -144,7 +117,6 @@ def preprocess_data(df, target_column="loan_status", test_size=0.2, random_state
         f"Preprocessing complete. X_train shape: {X_train_processed.shape}, X_test shape: {X_test_processed.shape}"
     )
 
-    # Return processed data and preprocessing objects
     return {
         "X_train": X_train_processed,
         "X_test": X_test_processed,

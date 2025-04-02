@@ -119,6 +119,15 @@ def predict():
         # Preprocess input data and make prediction
         from ml.predict import preprocess_and_predict
 
+        #        name = Column(String(100))
+        # version = Column(String(20))
+        # model_type = Column(String(50))  # xgboost, random_forest, etc.
+        # model_path = Column(String(255))
+
+        print(model.name)
+        print(model.version)
+        print(model.model_path)
+
         result = preprocess_and_predict(data, model.model_path)
 
         # Return prediction

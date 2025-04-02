@@ -98,6 +98,7 @@ def make_prediction(model, preprocessed_data):
 
 
 def preprocess_and_predict(data, model_path, preprocessor_path=None):
+    print("MODEL PATH", model_path)
     """
     Preprocess input data and make prediction.
 
@@ -112,11 +113,8 @@ def preprocess_and_predict(data, model_path, preprocessor_path=None):
     try:
         # Determine preprocessor path if not provided
         if preprocessor_path is None:
-            model_dir = os.path.dirname(model_path)
-            model_filename = os.path.basename(model_path)
-            model_name = os.path.splitext(model_filename)[0]
-            preprocessor_path = os.path.join(
-                model_dir, f"preprocessor_{model_name.split('_v1_')[1]}.joblib"
+            preprocessor_path = model_path.replace(
+                "xgboost_credit_risk", "preprocessor"
             )
 
         # Load model and preprocessor
