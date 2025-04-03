@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="dark">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,20 +21,20 @@
             --card-border: #2c3034;
             --text-muted: #9ca3af;
         }
-        
+
         body {
             background-color: var(--dark-bg);
             color: #e9ecef;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
-        
+
         .header {
             background-color: var(--darker-bg);
             border-bottom: 1px solid var(--card-border);
             padding: 20px 0;
             margin-bottom: 30px;
         }
-        
+
         .logo-text {
             font-weight: 700;
             background: linear-gradient(45deg, #6366f1, #8b5cf6);
@@ -41,7 +42,7 @@
             background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         .card {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
@@ -50,19 +51,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        
+
         .card:hover {
             transform: translateY(-4px);
             box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .card-header {
             background-color: rgba(0, 0, 0, 0.2);
             border-bottom: 1px solid var(--card-border);
             font-weight: 600;
             padding: 1rem 1.25rem;
         }
-        
+
         .stats-card {
             height: 100%;
             text-align: center;
@@ -72,13 +73,13 @@
             backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .stats-card .value {
             font-size: 2.5rem;
             font-weight: 700;
             margin: 0.5rem 0;
         }
-        
+
         .stats-card .title {
             color: var(--text-muted);
             font-size: 0.9rem;
@@ -86,119 +87,120 @@
             text-transform: uppercase;
             letter-spacing: 1px;
         }
-        
+
         .stats-primary {
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(99, 102, 241, 0.1));
         }
-        
+
         .stats-success {
             background: linear-gradient(135deg, rgba(16, 185, 129, 0.3), rgba(16, 185, 129, 0.1));
         }
-        
+
         .stats-danger {
             background: linear-gradient(135deg, rgba(239, 68, 68, 0.3), rgba(239, 68, 68, 0.1));
         }
-        
+
         .stats-info {
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.3), rgba(59, 130, 246, 0.1));
         }
-        
+
         .table {
             border-radius: 10px;
             overflow: hidden;
         }
-        
-        .table-striped > tbody > tr:nth-of-type(odd) > * {
+
+        .table-striped>tbody>tr:nth-of-type(odd)>* {
             background-color: rgba(0, 0, 0, 0.1);
         }
-        
-        .table > :not(caption) > * > * {
+
+        .table> :not(caption)>*>* {
             border-bottom-color: var(--card-border);
         }
-        
-        .dataTables_wrapper .dataTables_length, 
-        .dataTables_wrapper .dataTables_filter, 
-        .dataTables_wrapper .dataTables_info, 
-        .dataTables_wrapper .dataTables_processing, 
+
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_processing,
         .dataTables_wrapper .dataTables_paginate {
             color: #e9ecef;
             margin-bottom: 1rem;
         }
-        
+
         .dataTables_wrapper .dataTables_paginate .paginate_button {
             border-radius: 6px;
         }
-        
+
         .dataTables_wrapper .dataTables_paginate .paginate_button.current {
             background: var(--accent-color) !important;
             border-color: var(--accent-color) !important;
             color: white !important;
         }
-        
+
         .btn-accent {
             background-color: var(--accent-color);
             border-color: var(--accent-color);
             color: white;
         }
-        
+
         .btn-accent:hover {
             background-color: #5253cc;
             border-color: #5253cc;
             color: white;
         }
-        
+
         .btn-outline-accent {
             border-color: var(--accent-color);
             color: var(--accent-color);
         }
-        
+
         .btn-outline-accent:hover {
             background-color: var(--accent-color);
             color: white;
         }
-        
+
         .badge-default {
             background-color: var(--text-muted);
             color: #fff;
         }
-        
+
         #deleteAllModal .modal-content {
             background-color: var(--card-bg);
             border: 1px solid var(--card-border);
         }
-        
+
         #deleteAllModal .modal-header {
             background-color: #b91c1c;
             color: white;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        
+
         .alert-danger {
             background-color: rgba(239, 68, 68, 0.2);
             border-color: rgba(239, 68, 68, 0.5);
             color: #fca5a5;
         }
-        
+
         /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
         }
-        
+
         ::-webkit-scrollbar-track {
             background: var(--dark-bg);
         }
-        
+
         ::-webkit-scrollbar-thumb {
             background: #4b5563;
             border-radius: 4px;
         }
-        
+
         ::-webkit-scrollbar-thumb:hover {
             background: #6b7280;
         }
     </style>
 </head>
+
 <body>
     <!-- Header -->
     <div class="header">
@@ -209,11 +211,14 @@
                     <p class="text-muted mb-0">Admin Control Panel</p>
                 </div>
                 <div class="col-md-6 text-end">
-                    <a href="/api/health" class="btn btn-outline-accent me-2">
+                    <a href="/api/health" target="_blank" class="btn btn-outline-accent me-2">
                         <i class="bi bi-heart-pulse me-1"></i> API Health
                     </a>
+                    <a href="/predict" target="_blank" class="btn btn-outline-accent me-2">
+                        <i class="bi bi-calculator me-1"></i> Predict
+                    </a>
                     <a href="/" class="btn btn-accent">
-                        <i class="bi bi-house-door me-1"></i> Dashboard
+                        <i class="bi bi-house-door me-1"></i> Home
                     </a>
                 </div>
             </div>
@@ -262,7 +267,8 @@
                             <button type="button" class="btn btn-outline-accent me-2" id="refreshBtn">
                                 <i class="bi bi-arrow-clockwise me-1"></i> Refresh Data
                             </button>
-                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAllModal">
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal"
+                                data-bs-target="#deleteAllModal">
                                 <i class="bi bi-trash me-1"></i> Delete All Records
                             </button>
                         </div>
@@ -301,9 +307,9 @@
                                         <td>{{ record.loan_int_rate }}%</td>
                                         <td>
                                             {% if record.loan_status == 1 %}
-                                                <span class="badge bg-danger">Default</span>
+                                            <span class="badge bg-danger">Default</span>
                                             {% else %}
-                                                <span class="badge bg-success">Non-Default</span>
+                                            <span class="badge bg-success">Non-Default</span>
                                             {% endif %}
                                         </td>
                                         <td>{{ record.cb_person_default_on_file }}</td>
@@ -331,7 +337,8 @@
                 </div>
                 <div class="modal-body">
                     <div class="alert alert-danger">
-                        <p><strong>Warning!</strong> You are about to delete all credit risk records from the database.</p>
+                        <p><strong>Warning!</strong> You are about to delete all credit risk records from the database.
+                        </p>
                         <p class="mb-0">This action cannot be undone. Are you sure you want to proceed?</p>
                     </div>
                 </div>
@@ -352,9 +359,9 @@
     <!-- DataTables JS -->
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    
+
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Initialize DataTable
             $('#creditRiskTable').DataTable({
                 pageLength: 25,
@@ -365,44 +372,44 @@
                     search: "_INPUT_",
                     searchPlaceholder: "Search records..."
                 },
-                drawCallback: function() {
+                drawCallback: function () {
                     $('.dataTables_wrapper .dataTables_paginate .paginate_button').addClass('btn-sm');
                 }
             });
-            
+
             // Refresh data
-            $('#refreshBtn').click(function() {
+            $('#refreshBtn').click(function () {
                 const btn = $(this);
                 btn.html('<i class="bi bi-arrow-repeat"></i> Refreshing...');
                 btn.prop('disabled', true);
-                
-                setTimeout(function() {
+
+                setTimeout(function () {
                     location.reload();
                 }, 500);
             });
-            
+
             // Handle delete all records
-            $('#confirmDeleteAll').click(function() {
+            $('#confirmDeleteAll').click(function () {
                 const btn = $(this);
                 btn.html('<i class="bi bi-hourglass-split"></i> Deleting...');
                 btn.prop('disabled', true);
-                
+
                 $.ajax({
                     url: '/admin/delete-all',
                     type: 'POST',
-                    success: function(result) {
+                    success: function (result) {
                         // Close modal
                         $('#deleteAllModal').modal('hide');
-                        
+
                         // Update stats
                         $('#totalRecords').text('0');
                         $('#defaultCount').text('0');
                         $('#nonDefaultCount').text('0');
                         $('#defaultRate').text('0%');
-                        
+
                         // Clear table
                         $('#creditRiskTable').DataTable().clear().draw();
-                        
+
                         // Show success notification
                         const notification = `
                             <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -418,19 +425,19 @@
                                 </div>
                             </div>
                         `;
-                        
+
                         $('body').append(notification);
-                        
+
                         // Auto-dismiss toast after 3 seconds
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $('.toast').toast('hide');
                         }, 3000);
-                        
+
                         // Reset button state
                         btn.html('<i class="bi bi-trash me-1"></i> Yes, Delete All Records');
                         btn.prop('disabled', false);
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         // Show error notification
                         const notification = `
                             <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -446,18 +453,18 @@
                                 </div>
                             </div>
                         `;
-                        
+
                         $('body').append(notification);
-                        
+
                         // Auto-dismiss toast after 5 seconds
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $('.toast').toast('hide');
                         }, 5000);
-                        
+
                         // Reset button state
                         btn.html('<i class="bi bi-trash me-1"></i> Yes, Delete All Records');
                         btn.prop('disabled', false);
-                        
+
                         // Close modal
                         $('#deleteAllModal').modal('hide');
                     }
@@ -466,4 +473,5 @@
         });
     </script>
 </body>
+
 </html>
