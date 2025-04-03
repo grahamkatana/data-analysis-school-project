@@ -6,6 +6,7 @@ flask-cors
 werkzeug
 jinja2
 itsdangerous
+marshmallow
 
 # Data Processing
 pandas==2.1.1
@@ -29,3 +30,4 @@ flask-swagger-ui==4.11.1
 apispec==6.0.2
 flask[async]
 python-dotenv
+gunicorn
