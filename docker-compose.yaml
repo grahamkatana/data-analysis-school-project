@@ -15,9 +15,9 @@ services:
       - SECRET_KEY=${SECRET_KEY}
       - FLASK_APP=app.py
       - FLASK_ENV=production
-    volumes:
-      - ./ml/models:/app/ml/models
-      - ./data:/app/data
+    # volumes:
+    #   - ./ml/models:/app/ml/models
+    #   - ./data:/app/data
     # healthcheck:
     #   test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
     #   interval: 30s
