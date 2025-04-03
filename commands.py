@@ -25,7 +25,7 @@ def register_commands(app):
 @with_appcontext
 def init_db():
     """Initialize the database"""
-    from app import db
+    from extensions import db  # Import from extensions instead of app
 
     try:
         click.echo("Initializing database...")
@@ -43,10 +43,11 @@ def init_db():
 @with_appcontext
 def load_data(file, sample):
     """Load data from CSV into the database"""
-    from app import db
+    from extensions import db  # Import from extensions
     from models.credit_risk import CreditRisk
     from etl.extract import extract_data
     from etl.transform import transform_data
+    from flask import current_app  # Use this to access app.config
 
     try:
         click.echo("Loading data...")
@@ -91,8 +92,8 @@ def etl_pipeline(file, sample, output):
     from etl.extract import extract_data
     from etl.transform import transform_data
     from etl.load import load_to_db, save_to_csv
-    from app import db
-    from app import app
+    from extensions import db  # Import from extensions
+    from flask import current_app  # Use this to access app config
 
     try:
         click.echo("Starting ETL pipeline...")
@@ -116,7 +117,8 @@ def etl_pipeline(file, sample, output):
         else:
             # Use default output path from config
             default_output = os.path.join(
-                app.config["PROCESSED_DATA_DIR"], "processed_credit_risk_data.csv"
+                current_app.config.get("PROCESSED_DATA_DIR", "data/processed"),
+                "processed_credit_risk_data.csv",
             )
             click.echo(f"Saving processed data to {default_output}...")
             save_to_csv(df_transformed, default_output)
@@ -139,8 +141,9 @@ def etl_pipeline(file, sample, output):
 def train_model(input, model_type):
     """Train a machine learning model"""
     from ml.train import train_model_pipeline
-    from app import app, db
+    from extensions import db  # Import from extensions
     from models.credit_risk import MLModel
+    from flask import current_app  # Use this to access app config
     import json
 
     try:
@@ -149,12 +152,15 @@ def train_model(input, model_type):
         # Use default input path if not provided
         if input is None:
             input = os.path.join(
-                app.config["PROCESSED_DATA_DIR"], "processed_credit_risk_data.csv"
+                current_app.config.get("PROCESSED_DATA_DIR", "data/processed"),
+                "processed_credit_risk_data.csv",
             )
 
         # Train model
         model_info = train_model_pipeline(
-            input_file=input, model_type=model_type, model_dir=app.config["MODEL_DIR"]
+            input_file=input,
+            model_type=model_type,
+            model_dir=current_app.config.get("MODEL_DIR", "ml/models"),
         )
 
         # Save model info to database
@@ -182,7 +188,7 @@ def train_model(input, model_type):
 @with_appcontext
 def data_summary():
     """Print a summary of the data in the database"""
-    from app import db
+    from extensions import db  # Import from extensions
     from models.credit_risk import CreditRisk
 
     try:
@@ -238,50 +244,6 @@ def data_summary():
         )
 
         click.echo(f"  Loan Amount: min={min_loan}, max={max_loan}, avg={avg_loan}")
-
-    except Exception as e:
-        click.echo(f"Error getting data summary: {str(e)}")
-    """Print a summary of the data in the database"""
-    from app import db
-    from models.credit_risk import CreditRisk
-
-    try:
-        # Count total records
-        count = db.session.query(CreditRisk).count()
-        click.echo(f"Total records: {count}")
-
-        # Count by loan status
-        loan_status_counts = (
-            db.session.query(CreditRisk.loan_status, db.func.count(CreditRisk.id))
-            .group_by(CreditRisk.loan_status)
-            .all()
-        )
-
-        click.echo("\nLoan Status Distribution:")
-        for status, count in loan_status_counts:
-            click.echo(f"  {status}: {count} records")
-
-        # Show some basic statistics
-        click.echo("\nBasic Statistics:")
-        person_age_stats = db.session.query(
-            db.func.min(CreditRisk.person_age),
-            db.func.max(CreditRisk.person_age),
-            db.func.avg(CreditRisk.person_age),
-        ).first()
-
-        click.echo(
-            f"  Person Age: min={person_age_stats[0]}, max={person_age_stats[1]}, avg={person_age_stats[2]:.2f}"
-        )
-
-        loan_amnt_stats = db.session.query(
-            db.func.min(CreditRisk.loan_amnt),
-            db.func.max(CreditRisk.loan_amnt),
-            db.func.avg(CreditRisk.loan_amnt),
-        ).first()
-
-        click.echo(
-            f"  Loan Amount: min=${loan_amnt_stats[0]}, max=${loan_amnt_stats[1]}, avg=${loan_amnt_stats[2]:.2f}"
-        )
 
     except Exception as e:
         click.echo(f"Error getting data summary: {str(e)}")
