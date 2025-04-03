@@ -7,6 +7,8 @@ from flask import (
     url_for,
     send_from_directory,
 )
+import json
+import requests
 from swagger import spec, swaggerui_blueprint
 from flask_cors import CORS
 import os
@@ -29,6 +31,7 @@ API_URL = "/api/swagger.json"  # URL for serving the OpenAPI specification
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+app.url_map.strict_slashes = False
 app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Configure logging
@@ -53,6 +56,79 @@ db.init_app(app)
 
 # Import models and routes after db initialization to avoid circular imports
 from models.credit_risk import CreditRisk, CreditRiskSchema, MLModel
+
+
+@app.template_filter("tojson")
+def to_json(value, indent=None):
+    return json.dumps(value, indent=indent)
+
+
+@app.template_filter("fromjson")
+def from_json(value):
+    return json.loads(value)
+
+
+# Add this new route
+@app.route("/predict", methods=["GET", "POST"])
+def predict_loan():
+    """Loan default prediction page"""
+    error = None
+    result = None
+    form_data = {}
+
+    if request.method == "POST":
+        try:
+            # Get form data and convert to appropriate types
+            form_data = {
+                "person_age": int(request.form.get("person_age")),
+                "person_income": int(request.form.get("person_income")),
+                "person_home_ownership": int(request.form.get("person_home_ownership")),
+                "person_emp_length": float(request.form.get("person_emp_length")),
+                "loan_intent": int(request.form.get("loan_intent")),
+                "loan_grade": int(request.form.get("loan_grade")),
+                "loan_amnt": int(request.form.get("loan_amnt")),
+                "loan_int_rate": float(request.form.get("loan_int_rate")),
+                "cb_person_default_on_file": int(
+                    request.form.get("cb_person_default_on_file")
+                ),
+                "cb_person_cred_hist_length": int(
+                    request.form.get("cb_person_cred_hist_length")
+                ),
+                "debt_to_income": float(request.form.get("debt_to_income")),
+            }
+
+            # Calculate derived fields
+            form_data["loan_percent_income"] = round(
+                form_data["loan_amnt"] / form_data["person_income"], 4
+            )
+            form_data["income_to_loan_ratio"] = round(
+                form_data["person_income"] / form_data["loan_amnt"], 2
+            )
+
+            # Make prediction request to our API
+            api_url = request.url_root.rstrip("/") + "/api/ml/predict"
+            response = requests.post(
+                api_url, json=form_data, headers={"Content-Type": "application/json"}
+            )
+
+            if response.status_code == 200:
+                result_data = response.json()
+                if result_data.get("status") == "success":
+                    result = result_data
+                else:
+                    error = result_data.get("message", "Prediction failed")
+            else:
+                error = f"API request failed with status code: {response.status_code}"
+
+        except ValueError as e:
+            error = f"Invalid input: {str(e)}"
+        except Exception as e:
+            error = f"An error occurred: {str(e)}"
+
+    # For GET request or if there was an error, just render the form
+    return render_template(
+        "prediction.html", error=error, result=result, form_data=form_data
+    )
 
 
 @app.route("/api/swagger.json")

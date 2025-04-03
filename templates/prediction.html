@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loan Default Prediction - Credit Risk Analytics</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --dark-bg: #1a1d21;
+            --darker-bg: #141618;
+            --accent-color: #6366f1;
+            --secondary-accent: #8b5cf6;
+            --card-bg: #212529;
+            --card-border: #2c3034;
+            --text-muted: #9ca3af;
+            --success-bg: rgba(16, 185, 129, 0.1);
+            --danger-bg: rgba(239, 68, 68, 0.1);
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: #e9ecef;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .header {
+            background-color: var(--darker-bg);
+            border-bottom: 1px solid var(--card-border);
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+
+        .logo-text {
+            font-weight: 700;
+            background: linear-gradient(45deg, #6366f1, #8b5cf6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-bottom: 1px solid var(--card-border);
+            font-weight: 600;
+            padding: 1rem 1.25rem;
+        }
+
+        .btn-accent {
+            background-color: var(--accent-color);
+            border-color: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.25rem;
+            font-weight: 500;
+            border-radius: 6px;
+        }
+
+        .btn-accent:hover {
+            background-color: #5253cc;
+            border-color: #5253cc;
+            color: white;
+        }
+
+        .gradient-text {
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-accent));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .form-control,
+        .form-select {
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            color: #e9ecef;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            background-color: rgba(0, 0, 0, 0.3);
+            color: #e9ecef;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 0.25rem rgba(99, 102, 241, 0.25);
+        }
+
+        .risk-indicator {
+            width: 120px;
+            height: 120px;
+            border-radius: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .risk-indicator:hover {
+            transform: scale(1.05);
+        }
+
+        .code-block {
+            background-color: #2d3748;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            color: #e9ecef;
+            border: 1px solid var(--card-border);
+        }
+
+        .prediction-gauge {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        .gauge-label {
+            position: absolute;
+            font-size: 0.8rem;
+        }
+
+        .gauge-label.low {
+            left: 0;
+        }
+
+        .gauge-label.medium {
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .gauge-label.high {
+            right: 0;
+        }
+
+        .gauge-indicator {
+            position: absolute;
+            top: -15px;
+            transform: translateX(-50%);
+        }
+
+        .gauge-pointer {
+            width: 3px;
+            height: 15px;
+            margin: 0 auto;
+        }
+
+        .footer {
+            background-color: var(--darker-bg);
+            padding: 20px 0;
+            border-top: 1px solid var(--card-border);
+            margin-top: 40px;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--dark-bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="logo-text mb-0">Credit Risk Analytics</h1>
+                    <p class="text-muted mb-0">Loan Default Prediction Tool</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="/admin" class="btn btn-outline-light me-2">
+                        <i class="bi bi-speedometer2 me-1"></i> Admin Dashboard
+                    </a>
+                    <a href="/" class="btn btn-accent">
+                        <i class="bi bi-house-door me-1"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h4 class="mb-0"><i class="bi bi-calculator me-2"></i> Loan Default Risk Prediction</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Use our machine learning model to predict the probability of loan default based
+                            on applicant information.</p>
+
+                        {% if error %}
+                        <div class="alert alert-danger" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> {{ error }}
+                        </div>
+                        {% endif %}
+
+                        <form method="post" action="{{ url_for('predict_loan') }}" class="needs-validation" novalidate>
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="person_age">Age</label>
+                                        <input type="number" class="form-control" id="person_age" name="person_age"
+                                            value="{{ form_data.person_age|default(32) }}" required min="18" max="100">
+                                        <div class="form-text">Applicant's age (18-100)</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="person_income">Annual Income ($)</label>
+                                        <input type="number" class="form-control" id="person_income"
+                                            name="person_income" value="{{ form_data.person_income|default(65000) }}"
+                                            required min="0">
+                                        <div class="form-text">Yearly income in USD</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="person_home_ownership">Home Ownership</label>
+                                        <select class="form-select" id="person_home_ownership"
+                                            name="person_home_ownership" required>
+                                            <option value="0" {% if form_data.person_home_ownership==0 %}selected{%
+                                                endif %}>OWN</option>
+                                            <option value="1" {% if form_data.person_home_ownership==1 or
+                                                form_data.person_home_ownership is not defined %}selected{% endif %}>
+                                                MORTGAGE</option>
+                                            <option value="2" {% if form_data.person_home_ownership==2 %}selected{%
+                                                endif %}>RENT</option>
+                                            <option value="3" {% if form_data.person_home_ownership==3 %}selected{%
+                                                endif %}>OTHER</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="person_emp_length">Employment Length (years)</label>
+                                        <input type="number" class="form-control" id="person_emp_length"
+                                            name="person_emp_length"
+                                            value="{{ form_data.person_emp_length|default(8.5) }}" required min="0"
+                                            step="0.1">
+                                        <div class="form-text">Years at current employer</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="loan_intent">Loan Intent</label>
+                                        <select class="form-select" id="loan_intent" name="loan_intent" required>
+                                            <option value="0" {% if form_data.loan_intent==0 %}selected{% endif %}>
+                                                EDUCATION</option>
+                                            <option value="1" {% if form_data.loan_intent==1 %}selected{% endif %}>
+                                                MEDICAL</option>
+                                            <option value="2" {% if form_data.loan_intent==2 %}selected{% endif %}>
+                                                VENTURE</option>
+                                            <option value="3" {% if form_data.loan_intent==3 or form_data.loan_intent is
+                                                not defined %}selected{% endif %}>PERSONAL</option>
+                                            <option value="4" {% if form_data.loan_intent==4 %}selected{% endif %}>
+                                                HOMEIMPROVEMENT</option>
+                                            <option value="5" {% if form_data.loan_intent==5 %}selected{% endif %}>
+                                                DEBTCONSOLIDATION</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="loan_grade">Loan Grade</label>
+                                        <select class="form-select" id="loan_grade" name="loan_grade" required>
+                                            <option value="0" {% if form_data.loan_grade==0 %}selected{% endif %}>A
+                                            </option>
+                                            <option value="1" {% if form_data.loan_grade==1 %}selected{% endif %}>B
+                                            </option>
+                                            <option value="2" {% if form_data.loan_grade==2 or form_data.loan_grade is
+                                                not defined %}selected{% endif %}>C</option>
+                                            <option value="3" {% if form_data.loan_grade==3 %}selected{% endif %}>D
+                                            </option>
+                                            <option value="4" {% if form_data.loan_grade==4 %}selected{% endif %}>E
+                                            </option>
+                                            <option value="5" {% if form_data.loan_grade==5 %}selected{% endif %}>F
+                                            </option>
+                                            <option value="6" {% if form_data.loan_grade==6 %}selected{% endif %}>G
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="loan_amnt">Loan Amount ($)</label>
+                                        <input type="number" class="form-control" id="loan_amnt" name="loan_amnt"
+                                            value="{{ form_data.loan_amnt|default(12000) }}" required min="1000">
+                                        <div class="form-text">Amount requested in USD</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="loan_int_rate">Interest Rate (%)</label>
+                                        <input type="number" class="form-control" id="loan_int_rate"
+                                            name="loan_int_rate" value="{{ form_data.loan_int_rate|default(11.8) }}"
+                                            required min="1" max="30" step="0.1">
+                                        <div class="form-text">Annual interest rate</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="cb_person_default_on_file">Previous Default on File</label>
+                                        <select class="form-select" id="cb_person_default_on_file"
+                                            name="cb_person_default_on_file" required>
+                                            <option value="0" {% if form_data.cb_person_default_on_file==0 or
+                                                form_data.cb_person_default_on_file is not defined %}selected{% endif
+                                                %}>N (No)</option>
+                                            <option value="1" {% if form_data.cb_person_default_on_file==1 %}selected{%
+                                                endif %}>Y (Yes)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="cb_person_cred_hist_length">Credit History Length (years)</label>
+                                        <input type="number" class="form-control" id="cb_person_cred_hist_length"
+                                            name="cb_person_cred_hist_length"
+                                            value="{{ form_data.cb_person_cred_hist_length|default(12) }}" required
+                                            min="0">
+                                        <div class="form-text">Years of credit history</div>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="form-group mb-3">
+                                        <label for="debt_to_income">Debt to Income Ratio</label>
+                                        <input type="number" class="form-control" id="debt_to_income"
+                                            name="debt_to_income" value="{{ form_data.debt_to_income|default(0.38) }}"
+                                            required min="0" max="1" step="0.01">
+                                        <div class="form-text">Ratio of debt to income (0-1)</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="text-end mt-4">
+                                <button type="reset" class="btn btn-outline-secondary me-2">
+                                    <i class="bi bi-arrow-counterclockwise me-1"></i> Reset
+                                </button>
+                                <button type="submit" class="btn btn-accent">
+                                    <i class="bi bi-calculator me-1"></i> Calculate Risk
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% if result %}
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="mb-0"><i class="bi bi-graph-up me-2"></i> Prediction Results</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 text-center mb-4">
+                                {% set default_prob = result.probability[0][1] * 100 %}
+                                {% set is_default = result.prediction[0] == 1 %}
+
+                                {% if default_prob < 25 %} {% set risk_level="Low Risk" %} {% set risk_color="success"
+                                    %} {% set icon="check-circle-fill" %} {% elif default_prob < 50 %} {% set
+                                    risk_level="Moderate Risk" %} {% set risk_color="warning" %} {% set
+                                    icon="exclamation-circle-fill" %} {% else %} {% set risk_level="High Risk" %} {% set
+                                    risk_color="danger" %} {% set icon="exclamation-triangle-fill" %} {% endif %} <h4
+                                    class="mb-3">Risk Assessment</h4>
+                                    <div class="risk-indicator bg-{{ risk_color }} text-white mb-3">
+                                        <i class="bi bi-{{ icon }}"></i>
+                                    </div>
+                                    <h3 class="text-{{ risk_color }}">{{ risk_level }}</h3>
+                                    <p class="text-muted">Prediction confidence: {{
+                                        (result.model_info.metrics|fromjson).accuracy * 100 | round(2) }}%</p>
+
+                                    <div class="mt-4">
+                                        <h5 class="mb-3">Default Probability</h5>
+                                        <div class="mb-1 d-flex justify-content-between">
+                                            <span>Probability</span>
+                                            <span class="fw-bold text-{{ risk_color }}">{{ default_prob | round(2)
+                                                }}%</span>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" role="progressbar"
+                                                    style="width: 25%" aria-valuenow="25" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                                <div class="progress-bar bg-warning" role="progressbar"
+                                                    style="width: 25%" aria-valuenow="25" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                                <div class="progress-bar bg-danger" role="progressbar"
+                                                    style="width: 50%" aria-valuenow="50" aria-valuemin="0"
+                                                    aria-valuemax="100"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between mt-1">
+                                                <small>0%</small>
+                                                <small>25%</small>
+                                                <small>50%</small>
+                                                <small>100%</small>
+                                            </div>
+                                        </div>
+
+                                        <div class="prediction-gauge">
+                                            <div class="gauge-indicator" style="left: {{ default_prob }}%">
+                                                <div class="bg-{{ risk_color }} text-white rounded px-2 py-1 small">
+                                                    {{ default_prob | round(2) }}%
+                                                </div>
+                                                <div class="gauge-pointer bg-{{ risk_color }}"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <h4 class="mb-3">Prediction Details</h4>
+                                <table class="table table-bordered table-hover">
+                                    <tbody>
+                                        <tr>
+                                            <th>Predicted Outcome</th>
+                                            <td>
+                                                {% if result.prediction[0] == 1 %}
+                                                <span class="badge bg-danger">Default</span>
+                                                {% else %}
+                                                <span class="badge bg-success">Non-Default</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <th>Default Probability</th>
+                                            <td>{{ result.probability[0][1] * 100 | round(2) }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Non-Default Probability</th>
+                                            <td>{{ result.probability[0][0] * 100 | round(2) }}%</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Model Name</th>
+                                            <td>{{ result.model_info.name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Model Version</th>
+                                            <td>{{ result.model_info.version }}</td>
+                                        </tr>
+                                        <tr>
+                                            <th>Model Accuracy</th>
+                                            <td>{{ (result.model_info.metrics|fromjson).accuracy * 100 | round(2) }}%
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <div class="mt-4">
+                                    <h5 class="mb-3">Model Performance Metrics</h5>
+                                    {% set metrics = result.model_info.metrics|fromjson %}
+                                    <div class="row g-2">
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded">
+                                                <h6>Precision</h6>
+                                                <span class="h4">{{ metrics.precision * 100 | round(2) }}%</span>
+                                                <p class="small text-muted mb-0">How accurate the positive predictions
+                                                    are</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded">
+                                                <h6>Recall</h6>
+                                                <span class="h4">{{ metrics.recall * 100 | round(2) }}%</span>
+                                                <p class="small text-muted mb-0">How well actual positives are found</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded">
+                                                <h6>F1 Score</h6>
+                                                <span class="h4">{{ metrics.f1 * 100 | round(2) }}%</span>
+                                                <p class="small text-muted mb-0">Harmony between precision and recall
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div class="col-6">
+                                            <div class="p-3 border rounded">
+                                                <h6>ROC AUC</h6>
+                                                <span class="h4">{{ metrics.roc_auc * 100 | round(2) }}%</span>
+                                                <p class="small text-muted mb-0">Ability to distinguish between classes
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="accordion mt-4" id="responseAccordion">
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="headingOne">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                        <i class="bi bi-code-slash me-2"></i> View API Response JSON
+                                    </button>
+                                </h2>
+                                <div id="collapseOne" class="accordion-collapse collapse" aria-labelledby="headingOne"
+                                    data-bs-parent="#responseAccordion">
+                                    <div class="accordion-body">
+                                        <div class="code-block">
+                                            <pre id="jsonResponse">{{ result|tojson(indent=2) }}</pre>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">&copy; 2025 Credit Risk Analytics. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <a href="/admin" class="text-muted me-3">Admin Dashboard</a>
+                    <a href="/" class="text-muted">Home</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Form validation
+        (function () {
+            'use strict';
+
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Calculate derived fields
+        document.addEventListener('DOMContentLoaded', function () {
+            const personIncomeInput = document.getElementById('person_income');
+            const loanAmntInput = document.getElementById('loan_amnt');
+            const debtToIncomeInput = document.getElementById('debt_to_income');
+
+            // Function to recalculate ratio
+            function calculateRatios() {
+                if (personIncomeInput.value && loanAmntInput.value) {
+                    const income = parseFloat(personIncomeInput.value);
+                    const loanAmount = parseFloat(loanAmntInput.value);
+
+                    // Income to loan ratio
+                    const incomeToLoanRatio = income / loanAmount;
+
+                    // Update hidden fields if they exist
+                    if (document.getElementById('income_to_loan_ratio')) {
+                        document.getElementById('income_to_loan_ratio').value = incomeToLoanRatio.toFixed(2);
+                    }
+
+                    // Calculate loan percent income
+                    const loanPercentIncome = loanAmount / income;
+
+                    if (document.getElementById('loan_percent_income')) {
+                        document.getElementById('loan_percent_income').value = loanPercentIncome.toFixed(4);
+                    }
+                }
+            }
+
+            // Add event listeners
+            if (personIncomeInput && loanAmntInput) {
+                personIncomeInput.addEventListener('input', calculateRatios);
+                loanAmntInput.addEventListener('input', calculateRatios);
+
+                // Initial calculation
+                calculateRatios();
+            }
+        });
+    </script>
+</body>
+
+</html>
