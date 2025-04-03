@@ -27,6 +27,5 @@ imbalanced-learn==0.11.0
 
 flask-swagger-ui==4.11.1
 apispec==6.0.2
-logto
 flask[async]
-hypercon
+python-dotenv

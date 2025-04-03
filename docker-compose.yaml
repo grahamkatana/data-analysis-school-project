@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  web:
+    build: .
+    restart: always
+    ports:
+      - "5010:5000"
+    environment:
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - SECRET_KEY=${SECRET_KEY}
+      - FLASK_APP=app.py
+      - FLASK_ENV=production
+    volumes:
+      - ./ml/models:/app/ml/models
+      - ./data:/app/data
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 30s
