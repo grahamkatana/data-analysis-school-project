@@ -300,6 +300,441 @@ spec.path(
     },
 )
 
+
+# Schema for Loan Distribution response
+spec.components.schema(
+    "LoanDistributionItem",
+    {
+        "type": "object",
+        "properties": {"range": {"type": "string"}, "count": {"type": "integer"}},
+    },
+)
+
+spec.components.schema(
+    "LoanDistributionResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/LoanDistributionItem"},
+            },
+        },
+    },
+)
+
+# Schema for Default Rate by Month response
+spec.components.schema(
+    "DefaultRateMonthItem",
+    {
+        "type": "object",
+        "properties": {"month": {"type": "string"}, "default_rate": {"type": "number"}},
+    },
+)
+
+spec.components.schema(
+    "DefaultRateMonthResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/DefaultRateMonthItem"},
+            },
+        },
+    },
+)
+
+# Schema for Default Rate by Grade response
+spec.components.schema(
+    "DefaultRateGradeItem",
+    {
+        "type": "object",
+        "properties": {
+            "grade": {"type": "string"},
+            "default_rate": {"type": "number"},
+            "total_loans": {"type": "integer"},
+        },
+    },
+)
+
+spec.components.schema(
+    "DefaultRateGradeResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/DefaultRateGradeItem"},
+            },
+        },
+    },
+)
+
+# Schema for Correlation Matrix response
+spec.components.schema(
+    "CorrelationValue",
+    {
+        "type": "object",
+        "properties": {
+            "feature": {"type": "string"},
+            "correlation": {"type": "number"},
+        },
+    },
+)
+
+spec.components.schema(
+    "CorrelationFeature",
+    {
+        "type": "object",
+        "properties": {
+            "feature": {"type": "string"},
+            "values": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/CorrelationValue"},
+            },
+        },
+    },
+)
+
+spec.components.schema(
+    "CorrelationMatrixResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/CorrelationFeature"},
+            },
+        },
+    },
+)
+
+# Schema for Loan Counts response
+spec.components.schema(
+    "CategoryCount",
+    {
+        "type": "object",
+        "properties": {"category": {"type": "string"}, "count": {"type": "integer"}},
+    },
+)
+
+spec.components.schema(
+    "LoanCountsResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "object",
+                "properties": {
+                    "home_ownership": {
+                        "type": "array",
+                        "items": {"$ref": "#/components/schemas/CategoryCount"},
+                    },
+                    "loan_intent": {
+                        "type": "array",
+                        "items": {"$ref": "#/components/schemas/CategoryCount"},
+                    },
+                },
+            },
+        },
+    },
+)
+
+# Schema for Income Analysis response
+spec.components.schema(
+    "IncomeAnalysisItem",
+    {
+        "type": "object",
+        "properties": {
+            "income_range": {"type": "string"},
+            "count": {"type": "integer"},
+            "default_rate": {"type": "number"},
+        },
+    },
+)
+
+spec.components.schema(
+    "IncomeAnalysisResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/IncomeAnalysisItem"},
+            },
+        },
+    },
+)
+
+# Schema for Feature Importance response
+spec.components.schema(
+    "FeatureImportanceItem",
+    {
+        "type": "object",
+        "properties": {"feature": {"type": "string"}, "importance": {"type": "number"}},
+    },
+)
+
+spec.components.schema(
+    "FeatureImportanceResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/FeatureImportanceItem"},
+            },
+            "model_info": {
+                "type": "object",
+                "properties": {
+                    "id": {"type": "integer"},
+                    "name": {"type": "string"},
+                    "version": {"type": "string"},
+                },
+            },
+        },
+    },
+)
+
+# Schema for ML Models response
+spec.components.schema(
+    "MLModelItem",
+    {
+        "type": "object",
+        "properties": {
+            "id": {"type": "integer"},
+            "name": {"type": "string"},
+            "version": {"type": "string"},
+            "model_type": {"type": "string"},
+            "metrics": {"type": "string"},
+            "created_at": {"type": "string", "format": "date-time"},
+        },
+    },
+)
+
+spec.components.schema(
+    "MLModelsResponse",
+    {
+        "type": "object",
+        "properties": {
+            "status": {"type": "string"},
+            "data": {
+                "type": "array",
+                "items": {"$ref": "#/components/schemas/MLModelItem"},
+            },
+        },
+    },
+)
+
+# Now add the path definitions for the new endpoints
+
+# Loan Distribution
+spec.path(
+    path="/api/data/loan-distribution",
+    operations={
+        "get": {
+            "summary": "Get Loan Distribution",
+            "description": "Returns distribution of loans by amount ranges",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoanDistributionResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Default Rate by Month
+spec.path(
+    path="/api/data/default-rate-by-month",
+    operations={
+        "get": {
+            "summary": "Get Default Rate by Month",
+            "description": "Returns default rates for each month",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DefaultRateMonthResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Default Rate by Grade
+spec.path(
+    path="/api/data/default-rate-by-grade",
+    operations={
+        "get": {
+            "summary": "Get Default Rate by Loan Grade",
+            "description": "Returns default rates for each loan grade",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/DefaultRateGradeResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Correlation Matrix
+spec.path(
+    path="/api/data/correlation-matrix",
+    operations={
+        "get": {
+            "summary": "Get Correlation Matrix",
+            "description": "Returns correlation matrix for key features",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CorrelationMatrixResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Loan Counts
+spec.path(
+    path="/api/data/loan-counts",
+    operations={
+        "get": {
+            "summary": "Get Loan Counts by Category",
+            "description": "Returns loan counts by various categories",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/LoanCountsResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Income Analysis
+spec.path(
+    path="/api/data/income-analysis",
+    operations={
+        "get": {
+            "summary": "Get Income Analysis",
+            "description": "Returns analysis of loans by income ranges",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/IncomeAnalysisResponse"
+                            }
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Data Visualization"],
+        }
+    },
+)
+
+# Feature Importance
+spec.path(
+    path="/api/ml/feature-importance",
+    operations={
+        "get": {
+            "summary": "Get Feature Importance",
+            "description": "Returns feature importance scores from the latest ML model",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FeatureImportanceResponse"
+                            }
+                        }
+                    },
+                },
+                "404": {"description": "No trained model available"},
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Machine Learning"],
+        }
+    },
+)
+
+# ML Models list
+spec.path(
+    path="/api/ml/models",
+    operations={
+        "get": {
+            "summary": "Get ML Models",
+            "description": "Returns list of available ML models",
+            "responses": {
+                "200": {
+                    "description": "Successful response",
+                    "content": {
+                        "application/json": {
+                            "schema": {"$ref": "#/components/schemas/MLModelsResponse"}
+                        }
+                    },
+                },
+                "500": {"description": "Internal server error"},
+            },
+            "tags": ["Machine Learning"],
+        }
+    },
+)
+
 # Create Swagger UI Blueprint
 SWAGGER_URL = "/api/docs"  # URL for exposing Swagger UI
 API_URL = "/api/swagger.json"  # URL for serving OpenAPI spec

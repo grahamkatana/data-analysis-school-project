@@ -96,6 +96,9 @@ def register_routes(app):
     from models.credit_risk import CreditRisk, CreditRiskSchema, MLModel
     from swagger import spec
     from extensions import db
+    import pandas as pd
+    import numpy as np
+    from sqlalchemy import func, desc
 
     @app.route("/api/swagger.json")
     def swagger_json():
@@ -263,6 +266,239 @@ def register_routes(app):
             )
         except Exception as e:
             logger.error(f"Error making prediction: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/data/loan-counts", methods=["GET"])
+    def get_loan_counts():
+        """Get loan counts by various categories for dashboard visualizations"""
+        try:
+            # Count by home ownership
+            home_ownership_counts = (
+                db.session.query(
+                    CreditRisk.person_home_ownership, func.count(CreditRisk.id)
+                )
+                .group_by(CreditRisk.person_home_ownership)
+                .all()
+            )
+
+            home_ownership_data = [
+                {"category": str(ownership), "count": count}
+                for ownership, count in home_ownership_counts
+            ]
+
+            # Count by loan intent
+            intent_counts = (
+                db.session.query(CreditRisk.loan_intent, func.count(CreditRisk.id))
+                .group_by(CreditRisk.loan_intent)
+                .all()
+            )
+
+            intent_data = [
+                {"category": str(intent), "count": count}
+                for intent, count in intent_counts
+            ]
+
+            return jsonify(
+                {
+                    "status": "success",
+                    "data": {
+                        "home_ownership": home_ownership_data,
+                        "loan_intent": intent_data,
+                    },
+                }
+            )
+
+        except Exception as e:
+            logger.error(f"Error getting loan counts: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/data/income-analysis", methods=["GET"])
+    def get_income_analysis():
+        """Get income analysis data for visualizations"""
+        try:
+            # Calculate statistics by income percentiles
+            records = CreditRisk.query.all()
+            incomes = [r.person_income for r in records]
+
+            percentiles = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+            income_percentiles = np.percentile(incomes, percentiles)
+
+            result = []
+            for i in range(len(percentiles) - 1):
+                min_income = income_percentiles[i]
+                max_income = income_percentiles[i + 1]
+
+                # Count loans in this income range
+                range_records = [
+                    r for r in records if min_income <= r.person_income < max_income
+                ]
+                total_count = len(range_records)
+                default_count = sum(1 for r in range_records if r.loan_status == 1)
+
+                default_rate = 0
+                if total_count > 0:
+                    default_rate = (default_count / total_count) * 100
+
+                result.append(
+                    {
+                        "income_range": f"{int(min_income / 1000)}k-{int(max_income / 1000)}k",
+                        "count": total_count,
+                        "default_rate": round(default_rate, 1),
+                    }
+                )
+
+            return jsonify({"status": "success", "data": result})
+
+        except Exception as e:
+            logger.error(f"Error getting income analysis: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/data/default-rate-by-grade", methods=["GET"])
+    def get_default_rate_by_grade():
+        """Get default rate by loan grade for bar chart visualization"""
+        try:
+            grades = ["A", "B", "C", "D", "E", "F", "G"]
+            result = []
+
+            for grade_value, grade_name in enumerate(grades):
+                # Get total loans for this grade
+                total_loans = CreditRisk.query.filter(
+                    CreditRisk.loan_grade == grade_value
+                ).count()
+
+                if total_loans > 0:
+                    # Get default loans for this grade
+                    default_loans = CreditRisk.query.filter(
+                        CreditRisk.loan_grade == grade_value,
+                        CreditRisk.loan_status == 1,
+                    ).count()
+
+                    # Calculate default rate
+                    default_rate = (default_loans / total_loans) * 100
+
+                    result.append(
+                        {
+                            "grade": grade_name,
+                            "default_rate": round(default_rate, 1),
+                            "total_loans": total_loans,
+                        }
+                    )
+
+            return jsonify({"status": "success", "data": result})
+
+        except Exception as e:
+            logger.error(f"Error getting default rate by grade: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/data/correlation-matrix", methods=["GET"])
+    def get_correlation_matrix():
+        """Get correlation matrix for heatmap visualization"""
+        try:
+            # Fetch a sample of data
+            records = CreditRisk.query.limit(10000).all()
+
+            # Convert to DataFrame for correlation calculation
+            df = pd.DataFrame(
+                [
+                    {
+                        "person_age": r.person_age,
+                        "person_income": r.person_income,
+                        "loan_amnt": r.loan_amnt,
+                        "loan_int_rate": r.loan_int_rate,
+                        "loan_status": r.loan_status,
+                    }
+                    for r in records
+                ]
+            )
+
+            # Calculate correlation matrix
+            corr_matrix = df.corr().round(2)
+
+            # Convert to the format needed by the frontend
+            result = []
+            for feature in corr_matrix.index:
+                values = []
+                for col_feature in corr_matrix.columns:
+                    values.append(
+                        {
+                            "feature": col_feature,
+                            "correlation": corr_matrix.loc[feature, col_feature],
+                        }
+                    )
+
+                result.append({"feature": feature, "values": values})
+
+            return jsonify({"status": "success", "data": result})
+
+        except Exception as e:
+            logger.error(f"Error getting correlation matrix: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    # visualization routes to your register_routes function
+
+    @app.route("/api/data/loan-distribution", methods=["GET"])
+    def get_loan_distribution():
+        """Get loan amount distribution data for histogram visualization"""
+        try:
+            # Create loan amount ranges
+            ranges = [
+                {"min": 0, "max": 5000, "label": "0-5k"},
+                {"min": 5000, "max": 10000, "label": "5k-10k"},
+                {"min": 10000, "max": 15000, "label": "10k-15k"},
+                {"min": 15000, "max": 20000, "label": "15k-20k"},
+                {"min": 20000, "max": 25000, "label": "20k-25k"},
+                {"min": 25000, "max": 30000, "label": "25k-30k"},
+                {"min": 30000, "max": float("inf"), "label": "30k+"},
+            ]
+
+            distribution = []
+            for r in ranges:
+                if r["max"] == float("inf"):
+                    count = CreditRisk.query.filter(
+                        CreditRisk.loan_amnt >= r["min"]
+                    ).count()
+                else:
+                    count = CreditRisk.query.filter(
+                        CreditRisk.loan_amnt >= r["min"],
+                        CreditRisk.loan_amnt < r["max"],
+                    ).count()
+
+                distribution.append({"range": r["label"], "count": count})
+
+            return jsonify({"status": "success", "data": distribution})
+
+        except Exception as e:
+            logger.error(f"Error getting loan distribution: {str(e)}")
+            return jsonify({"status": "error", "message": str(e)}), 500
+
+    @app.route("/api/data/default-rate-by-month", methods=["GET"])
+    def get_default_rate_by_month():
+        """Get default rate by month for line chart visualization"""
+        try:
+            # This would typically come from time series data
+            # For demonstration, we'll create sample monthly data
+
+            # In a real implementation, you would query your database with date fields
+            # Here's a placeholder with sample data
+            monthly_data = [
+                {"month": "Jan", "default_rate": 18.2},
+                {"month": "Feb", "default_rate": 19.1},
+                {"month": "Mar", "default_rate": 20.5},
+                {"month": "Apr", "default_rate": 22.3},
+                {"month": "May", "default_rate": 21.8},
+                {"month": "Jun", "default_rate": 20.4},
+                {"month": "Jul", "default_rate": 19.7},
+                {"month": "Aug", "default_rate": 18.9},
+                {"month": "Sep", "default_rate": 21.2},
+                {"month": "Oct", "default_rate": 22.5},
+                {"month": "Nov", "default_rate": 23.1},
+                {"month": "Dec", "default_rate": 21.7},
+            ]
+
+            return jsonify({"status": "success", "data": monthly_data})
+
+        except Exception as e:
+            logger.error(f"Error getting default rate by month: {str(e)}")
             return jsonify({"status": "error", "message": str(e)}), 500
 
     # Admin Routes
