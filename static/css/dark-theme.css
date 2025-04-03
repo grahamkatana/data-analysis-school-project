@@ -1,0 +1,87 @@
+
+/* Dark Theme */
+:root {
+  --dark-bg: #121212;
+  --dark-surface: #1e1e1e;
+  --dark-surface-2: #2d2d2d;
+  --dark-surface-3: #333333;
+  --text-primary: #ffffff;
+  --text-secondary: #a0aec0;
+  --primary: #6366f1;
+  --primary-hover: #4f46e5;
+  --error: #f56565;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+}
+
+.card {
+  background-color: var(--dark-surface);
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.card-header {
+  background-color: var(--dark-surface);
+  border-bottom: 1px solid var(--dark-surface-2);
+}
+
+.form-control {
+  background-color: var(--dark-surface-2);
+  border: none;
+  color: var(--text-primary);
+}
+
+.form-control:focus {
+  background-color: var(--dark-surface-3);
+  box-shadow: 0 0 0 2px var(--primary);
+  color: var(--text-primary);
+}
+
+.btn-primary {
+  background-color: var(--primary);
+  border: none;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-hover);
+}
+
+pre {
+  background-color: var(--dark-surface-2);
+  color: var(--text-primary);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.text-success {
+  color: #48bb78 !important;
+}
+
+.bg-danger {
+  background-color: #c53030 !important;
+}
+
+.btn-secondary {
+  background-color: var(--dark-surface-2);
+  border: none;
+}
+
+.btn-secondary:hover {
+  background-color: var(--dark-surface-3);
+}
+
+.btn-danger {
+  background-color: var(--error);
+  border: none;
+}
+
+.btn-info {
+  background-color: #4299e1;
+  border: none;
+}
+                
