@@ -1,4 +1,13 @@
-from flask import Flask, jsonify, request, render_template
+from flask import (
+    Flask,
+    jsonify,
+    request,
+    render_template,
+    redirect,
+    url_for,
+    send_from_directory,
+)
+from swagger import spec, swaggerui_blueprint
 from flask_cors import CORS
 import os
 import logging
@@ -13,9 +22,14 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from config.config import DevelopmentConfig
 from extensions import db  # Import the db instance from extensions
 
+# These should be placed in your swagger.py file
+SWAGGER_URL = "/api/docs"  # URL for exposing Swagger UI (where users access the docs)
+API_URL = "/api/swagger.json"  # URL for serving the OpenAPI specification
+
 # Initialize Flask app
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
+app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
 
 # Configure logging
 logging.basicConfig(
@@ -41,6 +55,11 @@ db.init_app(app)
 from models.credit_risk import CreditRisk, CreditRiskSchema, MLModel
 
 
+@app.route("/api/swagger.json")
+def swagger_json():
+    return jsonify(spec.to_dict())
+
+
 @app.route("/", methods=["GET"])
 def index():
     """Root page"""
@@ -49,13 +68,69 @@ def index():
 
 @app.route("/api/health", methods=["GET"])
 def health_check():
-    """Health check endpoint to verify API is working"""
+    """
+    API Health Check
+    ---
+    tags:
+      - System
+    summary: API Health Check
+    description: Verifies that the API is running and operational
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HealthResponse'
+            example:
+              status: success
+              message: API is running
+    """
     return jsonify({"status": "success", "message": "API is running"})
 
 
 @app.route("/api/data", methods=["GET"])
 def get_data():
-    """Get paginated data with optional filtering"""
+    """
+    Get Paginated Data
+    ---
+    tags:
+      - Data
+    summary: Get Paginated Data
+    description: Returns paginated credit risk data with optional filtering
+    parameters:
+      - name: page
+        in: query
+        description: Page number
+        schema:
+          type: integer
+          default: 1
+      - name: per_page
+        in: query
+        description: Records per page
+        schema:
+          type: integer
+          default: 100
+      - name: loan_status
+        in: query
+        description: Filter by loan status (0=non-default, 1=default)
+        schema:
+          type: integer
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaginatedResponse'
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            example:
+              status: error
+              message: Error getting data
+    """
     try:
         # Get query parameters
         page = request.args.get("page", 1, type=int)
@@ -96,7 +171,74 @@ def get_data():
 
 @app.route("/api/ml/predict", methods=["POST"])
 def predict():
-    """Make predictions using the trained ML model"""
+    """
+    Make Prediction
+    ---
+    tags:
+      - Machine Learning
+    summary: Make Prediction
+    description: Makes credit risk predictions based on loan applicant data
+    requestBody:
+      description: Loan applicant data
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PredictionRequest'
+          example:
+            person_age: 35
+            person_income: 85000
+            person_home_ownership: 1
+            person_emp_length: 12.0
+            loan_intent: 3
+            loan_grade: 1
+            loan_amnt: 15000
+            loan_int_rate: 12.5
+            loan_percent_income: 0.18
+            cb_person_default_on_file: 0
+            cb_person_cred_hist_length: 15
+            debt_to_income: 0.32
+            income_to_loan_ratio: 5.67
+    responses:
+      200:
+        description: Successful prediction
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PredictionResponse'
+            example:
+              status: success
+              prediction: [0]
+              probability: [[0.85, 0.15]]
+              status_interpretation: ["Non-Default"]
+              default_probability: [0.15]
+              model_info:
+                id: 1
+                name: xgboost_credit_risk
+                version: v1_20230401_123456
+                metrics: "{\"accuracy\": 0.8745, \"precision\": 0.8213, \"recall\": 0.7964, \"f1\": 0.8086, \"roc_auc\": 0.8912}"
+      400:
+        description: Bad request - missing or invalid input data
+        content:
+          application/json:
+            example:
+              status: error
+              message: No input data provided
+      404:
+        description: No trained model available
+        content:
+          application/json:
+            example:
+              status: error
+              message: No trained model available
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            example:
+              status: error
+              message: Error making prediction
+    """
     try:
         # Get input data from request
         data = request.json
@@ -118,15 +260,6 @@ def predict():
 
         # Preprocess input data and make prediction
         from ml.predict import preprocess_and_predict
-
-        #        name = Column(String(100))
-        # version = Column(String(20))
-        # model_type = Column(String(50))  # xgboost, random_forest, etc.
-        # model_path = Column(String(255))
-
-        print(model.name)
-        print(model.version)
-        print(model.model_path)
 
         result = preprocess_and_predict(data, model.model_path)
 
@@ -204,7 +337,35 @@ def delete_all_records():
 
 @app.route("/api/data/summary", methods=["GET"])
 def get_data_summary():
-    """Return a summary of the credit risk data"""
+    """
+    Get Data Summary
+    ---
+    tags:
+      - Data
+    summary: Get Data Summary
+    description: Returns summary statistics about the credit risk data
+    responses:
+      200:
+        description: Successful response
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataSummaryResponse'
+            example:
+              status: success
+              data:
+                total_records: 32581
+                loan_status_distribution:
+                  '0': 25430
+                  '1': 7151
+      500:
+        description: Internal server error
+        content:
+          application/json:
+            example:
+              status: error
+              message: Error getting data summary
+    """
     try:
         # Get count of records
         count = CreditRisk.query.count()

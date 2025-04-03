@@ -1,9 +1,9 @@
 {
     "name": "xgboost_credit_risk",
-    "version": "v1_20250402_214453",
+    "version": "v1_20250402_224915",
     "model_type": "xgboost",
-    "model_path": "/Users/grahamkennethkatana/Desktop/dataanalytics/backend/ml/models/xgboost_credit_risk_v1_20250402_214453.joblib",
-    "preprocessor_path": "/Users/grahamkennethkatana/Desktop/dataanalytics/backend/ml/models/preprocessor_v1_20250402_214453.joblib",
+    "model_path": "/Users/grahamkennethkatana/Desktop/dataanalytics/backend/ml/models/xgboost_credit_risk_v1_20250402_224915.joblib",
+    "preprocessor_path": "/Users/grahamkennethkatana/Desktop/dataanalytics/backend/ml/models/preprocessor_v1_20250402_224915.joblib",
     "metrics": {
         "accuracy": 0.9340187202700629,
         "precision": 0.9652908067542214,
@@ -63,5 +63,5 @@
         "employment_length_to_age_ratio",
         "loan_to_income_percent"
     ],
-    "trained_at": "20250402_214453"
+    "trained_at": "20250402_224915"
 }
